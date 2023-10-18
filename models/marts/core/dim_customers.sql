@@ -1,21 +1,16 @@
-with customers as(
-    select * from {{ref('stg_customers')}}
-),
-
-orders as (
-
-    select * from {{ ref('stg_orders') }}
-
-),
+with customers as
+(select * from {{ref('stg_customers')}}),
+with orders as
+(select * from {{ref('stg_orders')}}),
 
 customer_orders as (
 
     select
-        id as customer_id,
+        customer_id,
 
         min(order_date) as first_order_date,
         max(order_date) as most_recent_order_date,
-        count(id) as number_of_orders
+        count(order_id) as number_of_orders
 
     from orders
 
@@ -26,7 +21,7 @@ customer_orders as (
 final as (
 
     select
-        customers.id,
+        customers.customer_id,
         customers.first_name,
         customers.last_name,
         customer_orders.first_order_date,
@@ -35,7 +30,7 @@ final as (
 
     from customers
 
-    left join customer_orders on customers.id=customer_orders.customer_id
+    left join customer_orders using (customer_id)
 
 )
 
